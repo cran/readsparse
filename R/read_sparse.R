@@ -67,6 +67,18 @@ check.for.overflow <- function(lst) {
     }
 }
 
+#' @title Determine if readsparse will handle non-ASCII file paths
+#' @description See \link{read.sparse} for details. In general, the library will
+#' be able to handle non-ASCII file paths, unless it is compiled with G++ version
+#' 4 or earlier (the default under Windows for older versions of RTools, such as
+#' RTools35).
+#' @return A logical/boolean value telling whether non-ASCII file names will be
+#' supported or not.
+#' @export
+readsparse_nonascii_support <- function() {
+    return(supports_nonascii_internal())
+}
+
 #' @title Read Sparse Matrix from Text File
 #' @description Read a labelled sparse CSR matrix in text format as used by libraries
 #' such as SVMLight, LibSVM, ThunderSVM, LibFM, xLearn, XGBoost, LightGBM, and more.
@@ -124,6 +136,11 @@ check.for.overflow <- function(lst) {
 #' 
 #' Be aware that the data is represented as a CSR matrix with index pointer of
 #' class C `int`, thus the number of rows/columns cannot exceed `.Machine$integer.max`.
+#' 
+#' On Windows, if using the GCC compiler version 4 or earlier (the default in older
+#' versions of RTools, such as Rtools35), it will not be able to read from or write to
+#' file names with non-ASCII characters. Whether support for non-ASCII file names is
+#' available or not can be checked through \link{readsparse_nonascii_support}.
 #' 
 #' On 64-bit Windows systems, if compiling the library with a compiler other than MinGW
 #' or MSVC, it will not be able to read files larger than 2GB. This should not be a concern
@@ -366,7 +383,7 @@ read.sparse <- function(file, multilabel=FALSE, has_qid=FALSE, integer_labels=FA
 #' starting at 1. Most software assumes this is `TRUE`.
 #' @param sort_indices Whether to sort the indices of `X` (and of `y` if multi-label) before
 #' writing the data. Note that this will cause in-place modifications if either `X` or `y`
-#' are passed as CSR matrices from `Matrix` package.
+#' are passed as CSR matrices from the `Matrix` package.
 #' @param ignore_zeros Whether to ignore (not write) features with a value of zero
 #' after rounding to the specified decimal places.
 #' @param add_header Whether to add a header with metadata as the first line (number of rows,
@@ -423,6 +440,25 @@ write.sparse <- function(file, X, y, qid=NULL, integer_labels=TRUE,
         y <- cast.sparse.vec(y)
     } else if (inherits(y, "dsparseVector")) {
         y <- as.numeric(y)
+    }
+
+    ### Note: this check should be made right here due to potential
+    ### in-place modifications of the data which would render the input unusable
+    ### TODO: this here could benefit from MatrixExtra
+    if (sort_indices) {
+        
+        if (inherits(y, "RsparseMatrix") && !inherits(y, "ngRMatrix")) {
+            y@j <- deepcopy_int(y@j)
+        }
+
+        if (inherits(X, "RsparseMatrix") && !inherits(X, "dgRMatrix")) {
+            X@j <- deepcopy_int(X@j)
+            if (inherits(X, "lsparseMatrix")) {
+                X@x <- deepcopy_log(X@x)
+            } else if (inherits(X, "dsparseMatrix")) {
+                X@x <- deepcopy_num(X@x)
+            }
+        }
     }
     
     if (!inherits(X, "RsparseMatrix"))
