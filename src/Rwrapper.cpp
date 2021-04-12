@@ -32,26 +32,46 @@
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::plugins(unwindProtect)]]
 
-#ifndef _FOR_CRAN
-
-extern "C" {
-    FILE *RC_fopen(const SEXP fn, const char *mode, const Rboolean expand);
-}
-#define R_fopen RC_fopen
-#define SUPPORTS_NON_ASCII true
-
+/* This library will use different code paths for opening a file path
+   in order to support non-ASCII characters, depending on compiler and
+   platform support. */
+#if (defined(_WIN32) || defined(_WIN64))
+#   if defined(__GNUC__) && (__GNUC__ >= 5)
+#       define USE_CODECVT
+#       define SUPPORTS_NON_ASCII true
+#       define TAKE_AS_UTF8 true
+#   elif !defined(_FOR_CRAN)
+#       define USE_RC_FOPEN
+#       define SUPPORTS_NON_ASCII true
+#       define TAKE_AS_UTF8 false
+#   else
+#       define USE_SIMPLE_FOPEN
+#       define SUPPORTS_NON_ASCII false
+#       define TAKE_AS_UTF8 false
+#   endif
+// #elif ((defined(__GNUC__) && (__GNUC__ >= 5)) || defined(__clang__)) && defined(__linux__)
+// #   define USE_CSS
+// #   define SUPPORTS_NON_ASCII true
+// #   define TAKE_AS_UTF8 true
+#elif !defined(_FOR_CRAN)
+#   define USE_RC_FOPEN
+#   define SUPPORTS_NON_ASCII true
+#   define TAKE_AS_UTF8 false
 #else
-#   if defined(_WIN32) || defined(_WIN64)
+#   define USE_SIMPLE_FOPEN
+#   define SUPPORTS_NON_ASCII true
+#   define TAKE_AS_UTF8 false
+#endif
+
+/* Now the actual implementations */
+#ifdef USE_CODECVT
 /* https://stackoverflow.com/questions/2573834/c-convert-string-or-char-to-wstring-or-wchar-t */
 /*  */
-#       if (defined(__GNUC__) && (__GNUC__ < 5))
 #include <locale>
 #include <codecvt>
 #include <string>
-FILE *CRAN_acceptable_fopen(Rcpp::CharacterVector fname, const char *mode, bool expand)
+FILE* R_fopen(Rcpp::CharacterVector fname, const char *mode)
 {
-    if (expand)
-        fname = Rcpp::Function("path.expand")(fname);
     Rcpp::String s(fname[0], CE_UTF8);
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring wide = converter.from_bytes(s.get_cstring());
@@ -59,33 +79,36 @@ FILE *CRAN_acceptable_fopen(Rcpp::CharacterVector fname, const char *mode, bool 
     std::wstring mode_ = converter.from_bytes(mode__);
     return _wfopen(wide.c_str(), mode_.c_str());
 }
-#define SUPPORTS_NON_ASCII true
-#       else
-FILE *CRAN_acceptable_fopen(Rcpp::CharacterVector fname, const char *mode, bool expand)
-{
-    if (expand)
-        fname = Rcpp::Function("path.expand")(fname);
-    Rcpp::String s(fname[0]);
-    return fopen(s.get_cstring(), mode);
+#endif
+
+#ifdef USE_RC_FOPEN
+extern "C" {
+    FILE *RC_fopen(const SEXP fn, const char *mode, const Rboolean expand);
 }
-#define SUPPORTS_NON_ASCII false
-#       endif
-#   else
-FILE *CRAN_acceptable_fopen(Rcpp::CharacterVector fname, const char *mode, bool expand)
+FILE* R_fopen(Rcpp::CharacterVector fname, const char *mode)
 {
-    if (expand)
-        fname = Rcpp::Function("path.expand")(fname);
-    Rcpp::String s(fname[0]);
-    s.set_encoding(CE_NATIVE);
-    return fopen(s.get_cstring(), mode);
-}
-#define SUPPORTS_NON_ASCII true
-#   endif
-FILE *R_fopen(const SEXP fname, const char *mode, const Rboolean expand)
-{
-    return CRAN_acceptable_fopen(fname, mode, expand);
+    return RC_fopen(fname[0], mode, FALSE);
 }
 #endif
+
+/* This one didn't end up working, leave it here as a reminder not to try again */
+// #ifdef USE_CSS
+// #undef TAKE_AS_UTF8
+// #define TAKE_AS_UTF8 true
+// FILE* R_fopen(Rcpp::CharacterVector fname, const char *mode)
+// {
+//     std::string mode_ = std::string(mode) + std::string(",css=UTF-8");
+//     return fopen(fname[0], mode_.c_str());
+// }
+// #endif
+
+#ifdef USE_SIMPLE_FOPEN
+FILE* R_fopen(Rcpp::CharacterVector fname, const char *mode)
+{
+    return fopen(fname[0], mode);
+}
+#endif
+
 
 // [[Rcpp::export(rng = false)]]
 bool supports_nonascii_internal()
@@ -93,15 +116,21 @@ bool supports_nonascii_internal()
     return SUPPORTS_NON_ASCII;
 }
 
+// [[Rcpp::export(rng = false)]]
+bool take_as_utf8()
+{
+    return TAKE_AS_UTF8;
+}
+
 class FileOpener
 {
 public:
     FILE *handle = NULL;
-    FileOpener(const SEXP fname, const char *mode, const Rboolean expand)
+    FileOpener(const SEXP fname, const char *mode)
     {
         if (this->handle != NULL)
             this->close_file();
-        this->handle = R_fopen(fname, mode, expand);
+        this->handle = R_fopen(fname, mode);
     }
     FILE *get_handle()
     {
@@ -206,7 +235,7 @@ Rcpp::List read_multi_label_R
     std::vector<int> qid;
     size_large nrows, ncols, nclasses;
 
-    FileOpener file_(fname[0], "r", TRUE);
+    FileOpener file_(fname[0], "r");
     FILE *input_file = file_.get_handle();
     if (input_file == NULL)
     {
@@ -362,7 +391,7 @@ Rcpp::List read_single_label_R
     std::vector<int> qid;
     size_large nrows, ncols, nclasses;
 
-    FileOpener file_(fname[0], "r", TRUE);
+    FileOpener file_(fname[0], "r");
     FILE *input_file = file_.get_handle();
     if (input_file == NULL)
     {
@@ -506,7 +535,7 @@ bool write_multi_label_R
     const bool append
 )
 {
-    FileOpener file_(fname[0], append? "a" : "w", TRUE);
+    FileOpener file_(fname[0], append? "a" : "w");
     FILE *output_file = file_.get_handle();
     if (output_file == NULL)
     {
@@ -639,7 +668,7 @@ bool write_single_label_numeric_R
     const bool append
 )
 {
-    FileOpener file_(fname[0], append? "a" : "w", TRUE);
+    FileOpener file_(fname[0], append? "a" : "w");
     FILE *output_file = file_.get_handle();
     if (output_file == NULL)
     {
@@ -688,7 +717,7 @@ bool write_single_label_integer_R
     const bool append
 )
 {
-    FileOpener file_(fname[0], append? "a" : "w", TRUE);
+    FileOpener file_(fname[0], append? "a" : "w");
     FILE *output_file = file_.get_handle();
     if (output_file == NULL)
     {
