@@ -1,8 +1,8 @@
-b59efb06696f30a7dd583073db346e9b *DESCRIPTION
+79738f2fef1e22dc2b9f755558f3228e *DESCRIPTION
 bb0566e915e1f94b9c617a3243439054 *LICENSE
 1a176c77f882ece8052f43a7b291d8df *NAMESPACE
 21abfc36d38d2fdbf0dc47038264ec53 *R/RcppExports.R
-41fe8a6ecaad0e2db78290c41319d492 *R/read_sparse.R
+fd9af7b47245a4f4fadefb8621cd08e7 *R/read_sparse.R
 7ed8cffadf47842d7c7a5d74b73fff0f *man/read.sparse.Rd
 3e858c264b057bc6b2064194c5057d29 *man/readsparse_nonascii_support.Rd
 4b6d6e60e7516094030020155a1c4bb2 *man/write.sparse.Rd
