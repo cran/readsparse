@@ -112,6 +112,8 @@
 template <class int_t>
 bool check_is_sorted(int_t* vec, size_t n);
 
+static void print_errno();
+
 template <class int_t, class real_t>
 void sort_sparse_indices
 (
@@ -207,7 +209,8 @@ bool read_multi_label_template
     const bool ignore_zero_valued,
     const bool sort_indices,
     const bool text_is_base1,
-    const bool assume_no_qid
+    const bool assume_no_qid,
+    const bool assume_trailing_ws
 );
 
 // template <class int_t=int64_t, class real_t=double>
@@ -227,7 +230,8 @@ bool read_multi_label_template
     const bool ignore_zero_valued,
     const bool sort_indices,
     const bool text_is_base1,
-    const bool assume_no_qid
+    const bool assume_no_qid,
+    const bool assume_trailing_ws
 );
 
 // template <class int_t=int64_t, class real_t=double, class label_t=double>
@@ -246,7 +250,8 @@ bool read_single_label_template
     const bool ignore_zero_valued,
     const bool sort_indices,
     const bool text_is_base1,
-    const bool assume_no_qid
+    const bool assume_no_qid,
+    const bool assume_trailing_ws
 );
 
 // template <class int_t=int64_t, class real_t=double, class label_t=double>
@@ -265,7 +270,8 @@ bool read_single_label_template
     const bool ignore_zero_valued,
     const bool sort_indices,
     const bool text_is_base1,
-    const bool assume_no_qid
+    const bool assume_no_qid,
+    const bool assume_trailing_ws
 );
 
 /* writer.hpp */

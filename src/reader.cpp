@@ -25,11 +25,21 @@
 *     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#if defined(_FOR_PYTHON) || defined(_FOR_R) || !defined(_WIN32)
+    #define EXPORTABLE 
+#else
+    #ifdef READSPARSE_COMPILE
+        #define EXPORTABLE __declspec(dllexport)
+    #else
+        #define EXPORTABLE __declspec(dllimport)
+    #endif
+#endif
+
 #include "reader.h"
 
 #ifdef _FOR_R
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -44,7 +54,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -61,11 +72,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -79,7 +91,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -95,11 +108,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -114,7 +128,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -131,11 +146,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -149,7 +165,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -165,13 +182,14 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
 #elif defined(_FOR_PYTHON)
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -186,7 +204,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -203,11 +222,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -221,7 +241,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -237,11 +258,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -255,7 +277,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -271,11 +294,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -290,7 +314,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -307,11 +332,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -325,7 +351,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -341,11 +368,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -359,7 +387,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -375,11 +404,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -394,7 +424,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -411,11 +442,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -429,7 +461,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -445,11 +478,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -463,7 +497,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -479,11 +514,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -498,7 +534,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -515,11 +552,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -533,7 +571,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -549,11 +588,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -567,7 +607,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -583,11 +624,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -602,7 +644,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -619,11 +662,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -637,7 +681,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -653,11 +698,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -671,7 +717,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -687,11 +734,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -706,7 +754,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -723,11 +772,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -741,7 +791,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -757,11 +808,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -775,7 +827,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -791,11 +844,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -810,7 +864,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -827,11 +882,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -845,7 +901,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -861,11 +918,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -879,7 +937,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -895,11 +954,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -914,7 +974,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -931,11 +992,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -949,7 +1011,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -965,11 +1028,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -983,7 +1047,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -999,13 +1064,14 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
 #else
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1020,7 +1086,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -1037,11 +1104,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1055,7 +1123,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1071,11 +1140,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1089,7 +1159,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1105,11 +1176,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1123,7 +1195,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1139,11 +1212,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1157,7 +1231,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1173,11 +1248,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1191,7 +1267,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1207,11 +1284,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1226,7 +1304,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -1243,11 +1322,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1261,7 +1341,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1277,11 +1358,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1295,7 +1377,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1311,11 +1394,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1329,7 +1413,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1345,11 +1430,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1363,7 +1449,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1379,11 +1466,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int> &indptr,
@@ -1397,7 +1485,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1413,11 +1502,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1432,7 +1522,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -1449,11 +1540,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1467,7 +1559,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1483,11 +1576,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1501,7 +1595,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1517,11 +1612,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1535,7 +1631,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1551,11 +1648,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1569,7 +1667,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1585,11 +1684,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1603,7 +1703,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1619,11 +1720,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1638,7 +1740,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -1655,11 +1758,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1673,7 +1777,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1689,11 +1794,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1707,7 +1813,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1723,11 +1830,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1741,7 +1849,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1757,11 +1866,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1775,7 +1885,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1791,11 +1902,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int64_t> &indptr,
@@ -1809,7 +1921,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1825,11 +1938,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -1844,7 +1958,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -1861,11 +1976,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -1879,7 +1995,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1895,11 +2012,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -1913,7 +2031,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1929,11 +2048,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -1947,7 +2067,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1963,11 +2084,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -1981,7 +2103,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -1997,11 +2120,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -2015,7 +2139,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2031,11 +2156,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -2050,7 +2176,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -2067,11 +2194,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -2085,7 +2213,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2101,11 +2230,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -2119,7 +2249,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2135,11 +2266,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -2153,7 +2285,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2169,11 +2302,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -2187,7 +2321,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2203,11 +2338,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<size_t> &indptr,
@@ -2221,7 +2357,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2237,11 +2374,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2256,7 +2394,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -2273,11 +2412,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2291,7 +2431,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2307,11 +2448,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2325,7 +2467,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2341,11 +2484,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2359,7 +2503,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2375,11 +2520,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2393,7 +2539,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2409,11 +2556,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2427,7 +2575,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2443,11 +2592,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2462,7 +2612,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -2479,11 +2630,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2497,7 +2649,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2513,11 +2666,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2531,7 +2685,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2547,11 +2702,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2565,7 +2721,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2581,11 +2738,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2599,7 +2757,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2615,11 +2774,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int> &indptr,
@@ -2633,7 +2793,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2649,11 +2810,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2668,7 +2830,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -2685,11 +2848,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2703,7 +2867,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2719,11 +2884,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2737,7 +2903,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2753,11 +2920,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2771,7 +2939,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2787,11 +2956,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2805,7 +2975,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2821,11 +2992,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2839,7 +3011,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2855,11 +3028,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2874,7 +3048,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -2891,11 +3066,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2909,7 +3085,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2925,11 +3102,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2943,7 +3121,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2959,11 +3138,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -2977,7 +3157,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -2993,11 +3174,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -3011,7 +3193,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3027,11 +3210,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int64_t> &indptr,
@@ -3045,7 +3229,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3061,11 +3246,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3080,7 +3266,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -3097,11 +3284,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3115,7 +3303,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3131,11 +3320,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3149,7 +3339,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3165,11 +3356,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3183,7 +3375,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3199,11 +3392,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3217,7 +3411,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3233,11 +3428,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3251,7 +3447,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3267,11 +3464,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3286,7 +3484,8 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_multi_label_template(
@@ -3303,11 +3502,12 @@ bool read_multi_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3321,7 +3521,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3337,11 +3538,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3355,7 +3557,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3371,11 +3574,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3389,7 +3593,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3405,11 +3610,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3423,7 +3629,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3439,11 +3646,12 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<size_t> &indptr,
@@ -3457,7 +3665,8 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 )
 {
     return read_single_label_template(
@@ -3473,7 +3682,8 @@ bool read_single_label
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
-        assume_no_qid
+        assume_no_qid,
+        assume_trailing_ws
     );
 }
 

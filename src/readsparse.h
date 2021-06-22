@@ -32,6 +32,16 @@
 #   include <stddef.h>
 #endif
 
+#if defined(_FOR_PYTHON) || defined(_FOR_R) || !defined(_WIN32)
+    #define EXPORTABLE 
+#else
+    #ifdef READSPARSE_COMPILE
+        #define EXPORTABLE __declspec(dllexport)
+    #else
+        #define EXPORTABLE __declspec(dllimport)
+    #endif
+#endif
+
 /*  Functions for reading and writing sparse CSR matrices in text format.
     See SVMLight's webpage for some details about the format:
         http://svmlight.joachims.org
@@ -153,6 +163,12 @@
         Whether to assume that the data has a qid field. If passing false and the
         data does turn out to have qid, the features will not be read. See
         'has_qid' for the writing functions.
+     - assume_trailing_ws
+        Whether to assume that lines in the input can have extra whitespaces at the
+        end before a newline. For large files which do not have any extra whitespace
+        at the end, parsing with this set to 'false' is typically 1.5x faster,
+        but if the file does turn out to have e.g. spaces at the end, the result
+        will be incorrect.
     - add_header
         Whether to add a header with metadata (number of rows, columns, and classes)
         as the first row. The reading functions will automatically detect if the
@@ -187,7 +203,7 @@
 #endif
 
 template <class int_t=int64_t, class real_t=double, class label_t=double>
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     std::istream &input_file,
     std::vector<int_t> &indptr,
@@ -201,11 +217,12 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 );
 
 template <class int_t=int64_t, class real_t=double, class label_t=double>
-bool read_single_label
+EXPORTABLE bool read_single_label
 (
     FILE *input_file,
     std::vector<int_t> &indptr,
@@ -219,11 +236,12 @@ bool read_single_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 );
 
 template <class int_t=int64_t, class real_t=double>
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     std::istream &input_file,
     std::vector<int_t> &indptr,
@@ -238,11 +256,12 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 );
 
 template <class int_t=int64_t, class real_t=double> 
-bool read_multi_label
+EXPORTABLE bool read_multi_label
 (
     FILE *input_file,
     std::vector<int_t> &indptr,
@@ -257,11 +276,12 @@ bool read_multi_label
     const bool ignore_zero_valued = true,
     const bool sort_indices = true,
     const bool text_is_base1 = true,
-    const bool assume_no_qid = true
+    const bool assume_no_qid = true,
+    const bool assume_trailing_ws = true
 );
 
 template <class int_t=int64_t, class real_t=double, class label_t=double>
-bool write_single_label
+EXPORTABLE bool write_single_label
 (
     std::ostream &output_file,
     int_t *indptr,
@@ -283,7 +303,7 @@ bool write_single_label
 );
 
 template <class int_t=int64_t, class real_t=double, class label_t=double>
-bool write_single_label
+EXPORTABLE bool write_single_label
 (
     FILE *output_file,
     int_t *indptr,
@@ -305,7 +325,7 @@ bool write_single_label
 );
 
 template <class int_t=int64_t, class real_t=double>
-bool write_multi_label
+EXPORTABLE bool write_multi_label
 (
     std::ostream &output_file,
     int_t *indptr,
@@ -327,7 +347,7 @@ bool write_multi_label
 );
 
 template <class int_t=int64_t, class real_t=double>
-bool write_multi_label
+EXPORTABLE bool write_multi_label
 (
     FILE *output_file,
     int_t *indptr,
