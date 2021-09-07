@@ -32,6 +32,8 @@
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::plugins(unwindProtect)]]
 
+#define throw_errno() {REprintf("Error %d: %s\n", errno, strerror(errno)); R_FlushConsole();}
+
 /* This library will use different code paths for opening a file path
    in order to support non-ASCII characters, depending on compiler and
    platform support. */
@@ -216,7 +218,8 @@ Rcpp::List read_multi_label_R
     const bool sort_indices,
     const bool text_is_base1,
     const bool assume_no_qid,
-    const bool assume_trailing_ws
+    const bool assume_trailing_ws,
+    const size_t limit_nrows
 )
 {
     Rcpp::List out = Rcpp::List::create(
@@ -240,7 +243,7 @@ Rcpp::List read_multi_label_R
     FILE *input_file = file_.get_handle();
     if (input_file == NULL)
     {
-        REprintf("Error %d: %s\n", errno, strerror(errno));
+        throw_errno();
         return Rcpp::List();
     }
     bool succeeded = read_multi_label(
@@ -254,6 +257,7 @@ Rcpp::List read_multi_label_R
         nrows,
         ncols,
         nclasses,
+        limit_nrows,
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
@@ -299,7 +303,8 @@ Rcpp::List read_multi_label_from_str_R
     const bool sort_indices,
     const bool text_is_base1,
     const bool assume_no_qid,
-    const bool assume_trailing_ws
+    const bool assume_trailing_ws,
+    const size_t limit_nrows
 )
 {
     Rcpp::List out = Rcpp::List::create(
@@ -334,6 +339,7 @@ Rcpp::List read_multi_label_from_str_R
         nrows,
         ncols,
         nclasses,
+        limit_nrows,
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
@@ -377,7 +383,8 @@ Rcpp::List read_single_label_R
     const bool sort_indices,
     const bool text_is_base1,
     const bool assume_no_qid,
-    const bool assume_trailing_ws
+    const bool assume_trailing_ws,
+    const size_t limit_nrows
 )
 {
     Rcpp::List out = Rcpp::List::create(
@@ -400,7 +407,7 @@ Rcpp::List read_single_label_R
     FILE *input_file = file_.get_handle();
     if (input_file == NULL)
     {
-        REprintf("Error %d: %s\n", errno, strerror(errno));
+        throw_errno();
         return Rcpp::List();
     }
     bool succeeded = read_single_label(
@@ -413,6 +420,7 @@ Rcpp::List read_single_label_R
         nrows,
         ncols,
         nclasses,
+        limit_nrows,
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
@@ -457,7 +465,8 @@ Rcpp::List read_single_label_from_str_R
     const bool sort_indices,
     const bool text_is_base1,
     const bool assume_no_qid,
-    const bool assume_trailing_ws
+    const bool assume_trailing_ws,
+    const size_t limit_nrows
 )
 {
     Rcpp::List out = Rcpp::List::create(
@@ -490,6 +499,7 @@ Rcpp::List read_single_label_from_str_R
         nrows,
         ncols,
         nclasses,
+        limit_nrows,
         ignore_zero_valued,
         sort_indices,
         text_is_base1,
@@ -547,7 +557,7 @@ bool write_multi_label_R
     FILE *output_file = file_.get_handle();
     if (output_file == NULL)
     {
-        REprintf("Error %d: %s\n", errno, strerror(errno));
+        throw_errno();
         return false;
     }
 
@@ -680,7 +690,7 @@ bool write_single_label_numeric_R
     FILE *output_file = file_.get_handle();
     if (output_file == NULL)
     {
-        REprintf("Error %d: %s\n", errno, strerror(errno));
+        throw_errno();
         return false;
     }
     bool succeeded = write_single_label(
@@ -729,7 +739,7 @@ bool write_single_label_integer_R
     FILE *output_file = file_.get_handle();
     if (output_file == NULL)
     {
-        REprintf("Error %d: %s\n", errno, strerror(errno));
+        throw_errno();
         return false;
     }
 
