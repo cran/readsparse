@@ -1,4 +1,4 @@
-b949b4693b1b3cb7c12ea518b7c44dc3 *DESCRIPTION
+74a4dca57b1bc255bc1413a4c8efd4bf *DESCRIPTION
 bb0566e915e1f94b9c617a3243439054 *LICENSE
 1a176c77f882ece8052f43a7b291d8df *NAMESPACE
 b185f2543b83e1e7c536a93ea697da9e *R/RcppExports.R
@@ -9,10 +9,10 @@ d41d8cd98f00b204e9800998ecf8427e *configure.win
 0644a6ce869a3dfbae54611e00220b43 *man/read.sparse.Rd
 3e858c264b057bc6b2064194c5057d29 *man/readsparse_nonascii_support.Rd
 4b6d6e60e7516094030020155a1c4bb2 *man/write.sparse.Rd
-ff2056bb035f4289058ddc30e64b2977 *src/Makevars.in
-6edbdefc78c18aff6a93b7d96d8fbc46 *src/Makevars.win
+07a695a5e17f5aa09cf1eed7b360cb21 *src/Makevars.in
+6c06282dd3c851668849192baf68e58d *src/Makevars.win
 2a14e73e44f57824c832146f7cf25aa5 *src/RcppExports.cpp
-44b41d3ef36cce3acd2a8871314db059 *src/Rwrapper.cpp
+5ae76bcb1c5e8e0b84034e5f5f8f9519 *src/Rwrapper.cpp
 eb9c474c71a7875059b6dc24e8456f1b *src/reader.cpp
 c5dcb7fbce0dcfe66bf8835faffd24cf *src/reader.h
 197a3e6fcd9d43fcedc08ffb9a5a913f *src/readsparse-win.def

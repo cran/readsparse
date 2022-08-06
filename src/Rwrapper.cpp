@@ -30,7 +30,6 @@
 #include "readsparse.h"
 #include "utils.h"
 // [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::plugins(unwindProtect)]]
 
 #define throw_errno() {REprintf("Error %d: %s\n", errno, strerror(errno)); R_FlushConsole();}
 
