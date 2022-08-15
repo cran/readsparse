@@ -1,8 +1,8 @@
-74a4dca57b1bc255bc1413a4c8efd4bf *DESCRIPTION
+801103c0207d9c96ae09994fc088211f *DESCRIPTION
 bb0566e915e1f94b9c617a3243439054 *LICENSE
 1a176c77f882ece8052f43a7b291d8df *NAMESPACE
 b185f2543b83e1e7c536a93ea697da9e *R/RcppExports.R
-20d06442a348be49d81fc933395395bb *R/read_sparse.R
+db4d9d0c86590b2da227c017126f92eb *R/read_sparse.R
 3049f0c12a49ca9cf7260d33e2df0abf *configure
 4f4a50d4897e3992372a86a50a3e77a4 *configure.ac
 d41d8cd98f00b204e9800998ecf8427e *configure.win
@@ -23,4 +23,4 @@ f3ec9e62730d4c9859f8b2d70da6905d *src/utils.h
 5221516de894bbb4796c7fb8eb5bb1c8 *src/writer.cpp
 7e90b27abfaf0155f65326ce0a846e19 *src/writer.h
 35d0a855266068df72cae75a1b2c0b9e *tests/testthat.R
-bce14edb5377b60808e3801ab5a044ba *tests/testthat/test-read-write.R
+fa424b50d39fc00a808b36d091867036 *tests/testthat/test-read-write.R
