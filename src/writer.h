@@ -927,19 +927,7 @@ bool write_single_label_template
             #endif
             {
                 #ifdef HAS_FULL_STDIO
-                #   if (defined(__GNUC__) || defined(__GNUG__)) && (__GNUC__ >= 5)
-                #       pragma GCC diagnostic push
-                #       pragma GCC diagnostic ignored "-Wformat"
-                #   elif defined(__clang__)
-                #       pragma clang diagnostic push
-                #       pragma clang diagnostic ignored "-Wformat"
-                #   endif
                 succeded = fprintf(output_file, label_specifier, decimal_places, labels[row]);
-                #   if (defined(__GNUC__) || defined(__GNUG__)) && (__GNUC__ >= 5)
-                #       pragma GCC diagnostic pop
-                #   elif defined(__clang__)
-                #       pragma clang diagnostic pop
-                #   endif
                 #else
                 #   if defined(_MSC_VER)
                 #       pragma warning( push )

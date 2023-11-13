@@ -25,6 +25,10 @@
 
 #ifdef _FOR_R
 
+#include <memory>
+#include <type_traits>
+#include <fstream>
+
 #include <Rcpp.h>
 #include <Rcpp/unwindProtect.h>
 #include "readsparse.h"
@@ -32,6 +36,11 @@
 // [[Rcpp::plugins(cpp11)]]
 
 #define throw_errno() {REprintf("Error %d: %s\n", errno, strerror(errno)); R_FlushConsole();}
+
+void throw_err_rcpp(const char *msg)
+{
+    throw Rcpp::exception(msg);
+}
 
 /* This library will use different code paths for opening a file path
    in order to support non-ASCII characters, depending on compiler and
@@ -150,6 +159,80 @@ public:
     }
 };
 
+#include <R.h>
+#include <Rinternals.h>
+#include <R_ext/Altrep.h>
+static R_altrep_class_t altrepped_vec_int;
+static R_altrep_class_t altrepped_vec_num;
+
+template <class T>
+void delete_vec(SEXP R_ptr)
+{
+    std::vector<T> *cpp_vec_ptr = (std::vector<T>*)R_ExternalPtrAddr(R_ptr);
+    delete cpp_vec_ptr;
+}
+
+template <class T>
+SEXP altrep_vec(void *void_ptr)
+{
+    std::unique_ptr<std::vector<T>> *cpp_vec = (std::unique_ptr<std::vector<T>>*)void_ptr;
+    std::vector<T> *ptr_cpp_vec = cpp_vec->get();
+    constexpr const bool is_int_type = std::is_same<T, int>::value;
+    if (!ptr_cpp_vec->size()) return is_int_type? Rcpp::IntegerVector() : Rcpp::NumericVector();
+    SEXP R_ptr = PROTECT(R_MakeExternalPtr(ptr_cpp_vec, R_NilValue, R_NilValue));
+    R_RegisterCFinalizerEx(R_ptr, delete_vec<T>, TRUE);
+    cpp_vec->release();
+    SEXP out = PROTECT(R_new_altrep(is_int_type? altrepped_vec_int : altrepped_vec_num, R_ptr, R_NilValue));
+    UNPROTECT(2);
+    return out;
+}
+
+template <class T>
+R_xlen_t altrepped_length_vec(SEXP R_ptr)
+{
+    std::vector<T> *cpp_vec_ptr = (std::vector<T>*)R_ExternalPtrAddr(R_altrep_data1(R_ptr));
+    return cpp_vec_ptr->size();
+}
+
+/* https://purrple.cat/blog/2018/10/14/altrep-and-cpp/ */
+/* --- */
+template <class T>
+Rboolean altrepped_inspect_vec(SEXP x, int pre, int deep, int pvec, void (*inspect_subtree)(SEXP, int, int, int))
+{
+    Rprintf("std::vector<int> (len=%d, ptr=%p)\n", altrepped_length_vec<T>(x), R_ExternalPtrAddr(R_altrep_data1(x)));
+    return TRUE;
+}
+
+template <class T>
+void* altrepped_dataptr_vec(SEXP R_ptr, Rboolean writeable)
+{
+    std::vector<T> *cpp_vec_ptr = (std::vector<T>*)R_ExternalPtrAddr(R_altrep_data1(R_ptr));
+    return cpp_vec_ptr->data();
+}
+
+template <class T>
+const void* altrepped_dataptrornull_vec(SEXP R_ptr)
+{
+    std::vector<T> *cpp_vec_ptr = (std::vector<T>*)R_ExternalPtrAddr(R_altrep_data1(R_ptr));
+    return cpp_vec_ptr->data();
+}
+
+// [[Rcpp::init]]
+void init_altrepped_vectors(DllInfo* dll)
+{
+    altrepped_vec_int = R_make_altinteger_class("altrepped_vec_int", "readsparse", dll);
+    R_set_altrep_Length_method(altrepped_vec_int, altrepped_length_vec<int>);
+    R_set_altrep_Inspect_method(altrepped_vec_int, altrepped_inspect_vec<int>);
+    R_set_altvec_Dataptr_method(altrepped_vec_int, altrepped_dataptr_vec<int>);
+    R_set_altvec_Dataptr_or_null_method(altrepped_vec_int, altrepped_dataptrornull_vec<int>);
+
+    altrepped_vec_num = R_make_altreal_class("altrepped_vec_num", "readsparse", dll);
+    R_set_altrep_Length_method(altrepped_vec_num, altrepped_length_vec<double>);
+    R_set_altrep_Inspect_method(altrepped_vec_num, altrepped_inspect_vec<double>);
+    R_set_altvec_Dataptr_method(altrepped_vec_num, altrepped_dataptr_vec<double>);
+    R_set_altvec_Dataptr_or_null_method(altrepped_vec_num, altrepped_dataptrornull_vec<double>);
+}
+
 SEXP convert_IntVecToRcpp(void *data)
 {
     return Rcpp::IntegerVector(((std::vector<int>*)data)->begin(),
@@ -221,6 +304,7 @@ Rcpp::List read_multi_label_R
     const size_t limit_nrows
 )
 {
+    Rcpp::String fstr = fname[0];
     Rcpp::List out = Rcpp::List::create(
         Rcpp::_["nrows"] = Rcpp::IntegerVector(1),
         Rcpp::_["ncols"] = Rcpp::IntegerVector(1),
@@ -233,26 +317,25 @@ Rcpp::List read_multi_label_R
         Rcpp::_["qid"] = R_NilValue
     );
 
-    std::vector<int> indptr, indices, indptr_lab, indices_lab;
-    std::vector<double> values;
-    std::vector<int> qid;
+    std::unique_ptr<std::vector<int>> indptr(new std::vector<int>());
+    std::unique_ptr<std::vector<int>> indices(new std::vector<int>());
+    std::unique_ptr<std::vector<int>> indptr_lab(new std::vector<int>());
+    std::unique_ptr<std::vector<int>> indices_lab(new std::vector<int>());
+    std::unique_ptr<std::vector<double>> values(new std::vector<double>());
+    std::unique_ptr<std::vector<int>> qid(new std::vector<int>());
     size_large nrows, ncols, nclasses;
 
-    FileOpener file_(fname[0], "r");
-    FILE *input_file = file_.get_handle();
-    if (input_file == NULL)
-    {
-        throw_errno();
-        return Rcpp::List();
-    }
+    const char * c_fname = fstr.get_cstring();
+    std::ifstream fstream(c_fname, std::ios::in);
+
     bool succeeded = read_multi_label(
-        input_file,
-        indptr,
-        indices,
-        values,
-        indptr_lab,
-        indices_lab,
-        qid,
+        fstream,
+        *indptr,
+        *indices,
+        *values,
+        *indptr_lab,
+        *indices_lab,
+        *qid,
         nrows,
         ncols,
         nclasses,
@@ -263,7 +346,6 @@ Rcpp::List read_multi_label_R
         assume_no_qid,
         assume_trailing_ws
     );
-    file_.close_file();
 
     if (!succeeded)
         return Rcpp::List();
@@ -278,19 +360,12 @@ Rcpp::List read_multi_label_R
     INTEGER(out["nrows"])[0] = (int)nrows;
     INTEGER(out["ncols"])[0] = (int)ncols;
     INTEGER(out["nclasses"])[0] = (int)nclasses;
-    out["values"] = Rcpp::unwindProtect(convert_NumVecToRcpp, (void*)&values);
-
-    values.clear();
-    out["indptr"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indptr);
-    indptr.clear();
-    out["indices"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indices);
-    indices.clear();
-    out["indptr_lab"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indptr_lab);
-    indptr_lab.clear();
-    out["indices_lab"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indices_lab);
-    indices_lab.clear();
-    out["qid"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&qid);
-    qid.clear();
+    out["values"] = Rcpp::unwindProtect(altrep_vec<double>, (void*)&values);
+    out["indptr"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indptr);
+    out["indices"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indices);
+    out["indptr_lab"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indptr_lab);
+    out["indices_lab"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indices_lab);
+    out["qid"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&qid);
     return out;
 }
 
@@ -322,19 +397,19 @@ Rcpp::List read_multi_label_from_str_R
     std::stringstream ss;
     ss.str(file_as_str_cpp);
 
-    std::vector<int> indptr, indices, indptr_lab, indices_lab;
-    std::vector<double> values;
-    std::vector<int> qid;
+    std::unique_ptr<std::vector<int>> indptr(new std::vector<int>()), indices(new std::vector<int>()), indptr_lab(new std::vector<int>()), indices_lab(new std::vector<int>());
+    std::unique_ptr<std::vector<double>> values(new std::vector<double>());
+    std::unique_ptr<std::vector<int>> qid(new std::vector<int>());
     size_large nrows, ncols, nclasses;
 
     bool succeeded = read_multi_label(
         ss,
-        indptr,
-        indices,
-        values,
-        indptr_lab,
-        indices_lab,
-        qid,
+        *indptr,
+        *indices,
+        *values,
+        *indptr_lab,
+        *indices_lab,
+        *qid,
         nrows,
         ncols,
         nclasses,
@@ -358,19 +433,12 @@ Rcpp::List read_multi_label_from_str_R
     INTEGER(out["nrows"])[0] = (int)nrows;
     INTEGER(out["ncols"])[0] = (int)ncols;
     INTEGER(out["nclasses"])[0] = (int)nclasses;
-    out["values"] = Rcpp::unwindProtect(convert_NumVecToRcpp, (void*)&values);
-
-    values.clear();
-    out["indptr"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indptr);
-    indptr.clear();
-    out["indices"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indices);
-    indices.clear();
-    out["indptr_lab"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indptr_lab);
-    indptr_lab.clear();
-    out["indices_lab"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indices_lab);
-    indices_lab.clear();
-    out["qid"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&qid);
-    qid.clear();
+    out["values"] = Rcpp::unwindProtect(altrep_vec<double>, (void*)&values);
+    out["indptr"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indptr);
+    out["indices"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indices);
+    out["indptr_lab"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indptr_lab);
+    out["indices_lab"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indices_lab);
+    out["qid"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&qid);
     return out;
 }
 
@@ -386,6 +454,7 @@ Rcpp::List read_single_label_R
     const size_t limit_nrows
 )
 {
+    Rcpp::String fstr = fname[0];
     Rcpp::List out = Rcpp::List::create(
         Rcpp::_["nrows"] = Rcpp::IntegerVector(1),
         Rcpp::_["ncols"] = Rcpp::IntegerVector(1),
@@ -397,25 +466,21 @@ Rcpp::List read_single_label_R
         Rcpp::_["qid"] = R_NilValue
     );
 
-    std::vector<int> indptr, indices;
-    std::vector<double> values, labels;
-    std::vector<int> qid;
+    std::unique_ptr<std::vector<int>> indptr(new std::vector<int>()), indices(new std::vector<int>());
+    std::unique_ptr<std::vector<double>> values(new std::vector<double>()), labels(new std::vector<double>());
+    std::unique_ptr<std::vector<int>> qid(new std::vector<int>());
     size_large nrows, ncols, nclasses;
 
-    FileOpener file_(fname[0], "r");
-    FILE *input_file = file_.get_handle();
-    if (input_file == NULL)
-    {
-        throw_errno();
-        return Rcpp::List();
-    }
+    const char * c_fname = fstr.get_cstring();
+    std::ifstream fstream(c_fname, std::ios::in);
+
     bool succeeded = read_single_label(
-        input_file,
-        indptr,
-        indices,
-        values,
-        labels,
-        qid,
+        fstream,
+        *indptr,
+        *indices,
+        *values,
+        *labels,
+        *qid,
         nrows,
         ncols,
         nclasses,
@@ -426,7 +491,6 @@ Rcpp::List read_single_label_R
         assume_no_qid,
         assume_trailing_ws
     );
-    file_.close_file();
     
     if (!succeeded)
         return Rcpp::List();
@@ -442,17 +506,11 @@ Rcpp::List read_single_label_R
     INTEGER(out["nrows"])[0] = (int)nrows;
     INTEGER(out["ncols"])[0] = (int)ncols;
     INTEGER(out["nclasses"])[0] = (int)nclasses;
-    out["values"] = Rcpp::unwindProtect(convert_NumVecToRcpp, (void*)&values);
-
-    values.clear();
-    out["indptr"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indptr);
-    indptr.clear();
-    out["indices"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indices);
-    indices.clear();
-    out["labels"] = Rcpp::unwindProtect(convert_NumVecToRcpp, (void*)&labels);
-    labels.clear();
-    out["qid"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&qid);
-    qid.clear();
+    out["values"] = Rcpp::unwindProtect(altrep_vec<double>, (void*)&values);
+    out["indptr"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indptr);
+    out["indices"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indices);
+    out["labels"] = Rcpp::unwindProtect(altrep_vec<double>, (void*)&labels);
+    out["qid"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&qid);
     return out;
 }
 
@@ -483,18 +541,18 @@ Rcpp::List read_single_label_from_str_R
     std::stringstream ss;
     ss.str(file_as_str_cpp);
 
-    std::vector<int> indptr, indices;
-    std::vector<double> values, labels;
-    std::vector<int> qid;
+    std::unique_ptr<std::vector<int>> indptr(new std::vector<int>()), indices(new std::vector<int>());
+    std::unique_ptr<std::vector<double>> values(new std::vector<double>()), labels(new std::vector<double>());
+    std::unique_ptr<std::vector<int>> qid(new std::vector<int>());
     size_large nrows, ncols, nclasses;
 
     bool succeeded = read_single_label(
         ss,
-        indptr,
-        indices,
-        values,
-        labels,
-        qid,
+        *indptr,
+        *indices,
+        *values,
+        *labels,
+        *qid,
         nrows,
         ncols,
         nclasses,
@@ -518,17 +576,11 @@ Rcpp::List read_single_label_from_str_R
     INTEGER(out["nrows"])[0] = (int)nrows;
     INTEGER(out["ncols"])[0] = (int)ncols;
     INTEGER(out["nclasses"])[0] = (int)nclasses;
-    out["values"] = Rcpp::unwindProtect(convert_NumVecToRcpp, (void*)&values);
-
-    values.clear();
-    out["indptr"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indptr);
-    indptr.clear();
-    out["indices"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&indices);
-    indices.clear();
-    out["labels"] = Rcpp::unwindProtect(convert_NumVecToRcpp, (void*)&labels);
-    labels.clear();
-    out["qid"] = Rcpp::unwindProtect(convert_IntVecToRcpp, (void*)&qid);
-    qid.clear();
+    out["values"] = Rcpp::unwindProtect(altrep_vec<double>, (void*)&values);
+    out["indptr"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indptr);
+    out["indices"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&indices);
+    out["labels"] = Rcpp::unwindProtect(altrep_vec<double>, (void*)&labels);
+    out["qid"] = Rcpp::unwindProtect(altrep_vec<int>, (void*)&qid);
     return out;
 }
 
