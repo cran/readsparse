@@ -80,18 +80,6 @@ process.file.name <- function(fname) {
     return(fname)
 }
 
-#' @title Determine if readsparse will handle non-ASCII file paths
-#' @description See \link{read.sparse} for details. In general, the library will
-#' be able to handle non-ASCII file paths, unless it is compiled with G++ version
-#' 4 or earlier (the default under Windows for older versions of RTools, such as
-#' RTools35).
-#' @return A logical/boolean value telling whether non-ASCII file names will be
-#' supported or not.
-#' @export
-readsparse_nonascii_support <- function() {
-    return(supports_nonascii_internal())
-}
-
 #' @title Read Sparse Matrix from Text File
 #' @description Read a labelled sparse CSR matrix in text format as used by libraries
 #' such as SVMLight, LibSVM, ThunderSVM, LibFM, xLearn, XGBoost, LightGBM, and more.
@@ -150,14 +138,6 @@ readsparse_nonascii_support <- function() {
 #' class C `int`, thus the number of rows/columns/non-zero-elements cannot exceed
 #' `.Machine$integer.max`.
 #' 
-#' On Windows, if the package is installed from CRAN and compiled using the GCC
-#' compiler version 4 or earlier (the default in older versions of RTools, such
-#' as Rtools35), it will not be able to read from or write to file names with
-#' non-ASCII characters, which can be solved by installing it directly from the
-#' GitHub repository (`remotes::install_github("david-cortes/readsparse")`).
-#' Whether support for non-ASCII file names is available or not can be checked
-#' through \link{readsparse_nonascii_support}.
-#' 
 #' On 64-bit Windows systems, if compiling the library with a compiler other than MinGW
 #' or MSVC, it will not be able to read files larger than 2GB. This should not be a concern
 #' if installing it from CRAN or from R itself, as the Windows version at the time
@@ -205,10 +185,14 @@ readsparse_nonascii_support <- function() {
 #' @param limit_nrows Maximum number of rows to read from the data. If there are more
 #' than this number of rows, it will only read the first 'limit_nrows' rows.
 #' If passing zero (the default), there will be no row limit.
-#' @param no_trailing_ws Whether to assume that lines in the file will never have extra whitespaces
-# at the end before a new line. Parsing large files with this option set to
-# `TRUE` can be 1.5x faster, but if the file does turn up to have e.g. extra
-# spaces at the end of lines, the results will be incorrect.
+#' @param use_altrep Whether to use R's ALTREP system to return C++ vector objects
+#' without generating extra data copies. If passing `FALSE`, each piece of data will
+#' be copied into a an R-allocated vector and returned as such.
+#' 
+#' Passing `TRUE` is faster and uses less memory (as there are no redundant data copies),
+#' but these ALTREP'd objects can potentially result in some functions/methods running
+#' slower on them than on R objects (for example, manually sub-setting the vectors in
+#' the S4 Matrix classes that are returned can potentially be slower by some microseconds).
 #' @param from_string Whether to read the data from a string variable instead of a file.
 #' If passing `from_string=TRUE`, then `file` is assumed to be a variable with the
 #' data contents on it.
@@ -266,8 +250,8 @@ readsparse_nonascii_support <- function() {
 #' The format is also described at the SVMLight webpage: \url{http://svmlight.joachims.org}.
 read.sparse <- function(file, multilabel=FALSE, has_qid=FALSE, integer_labels=FALSE,
                         index1=TRUE, sort_indices=TRUE, ignore_zeros=TRUE,
-                        min_cols=0L, min_classes=0L, limit_nrows=0L, no_trailing_ws=FALSE,
-                        from_string=FALSE) {
+                        min_cols=0L, min_classes=0L, limit_nrows=0L,
+                        use_altrep=TRUE, from_string=FALSE) {
     multilabel      <-  check.bool(multilabel, "multilabel")
     has_qid         <-  check.bool(has_qid, "has_qid")
     integer_labels  <-  check.bool(integer_labels, "integer_labels")
@@ -275,8 +259,8 @@ read.sparse <- function(file, multilabel=FALSE, has_qid=FALSE, integer_labels=FA
     sort_indices    <-  check.bool(sort_indices, "sort_indices")
     ignore_zeros    <-  check.bool(ignore_zeros, "ignore_zeros")
     from_string     <-  check.bool(from_string, "from_string")
-    no_trailing_ws  <-  check.bool(no_trailing_ws, "no_trailing_ws")
-    
+    use_altrep      <-  check.bool(use_altrep, "use_altrep")
+
     min_cols        <-  check.int(min_cols, "min_cols")
     min_classes     <-  check.int(min_classes, "min_classes")
     limit_nrows     <-  check.int(limit_nrows, "limit_nrows")
@@ -313,8 +297,8 @@ read.sparse <- function(file, multilabel=FALSE, has_qid=FALSE, integer_labels=FA
         sort_indices,
         index1,
         !has_qid,
-        !no_trailing_ws,
-        limit_nrows
+        limit_nrows,
+        use_altrep
     )
     
     if (!length(r))

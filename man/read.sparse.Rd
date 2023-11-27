@@ -15,7 +15,7 @@ read.sparse(
   min_cols = 0L,
   min_classes = 0L,
   limit_nrows = 0L,
-  no_trailing_ws = FALSE,
+  use_altrep = TRUE,
   from_string = FALSE
 )
 }
@@ -60,7 +60,14 @@ in case some columns are all missing in the input data. Only used when passing
 than this number of rows, it will only read the first 'limit_nrows' rows.
 If passing zero (the default), there will be no row limit.}
 
-\item{no_trailing_ws}{Whether to assume that lines in the file will never have extra whitespaces}
+\item{use_altrep}{Whether to use R's ALTREP system to return C++ vector objects
+without generating extra data copies. If passing `FALSE`, each piece of data will
+be copied into a an R-allocated vector and returned as such.
+
+Passing `TRUE` is faster and uses less memory (as there are no redundant data copies),
+but these ALTREP'd objects can potentially result in some functions/methods running
+slower on them than on R objects (for example, manually sub-setting the vectors in
+the S4 Matrix classes that are returned can potentially be slower by some microseconds).}
 
 \item{from_string}{Whether to read the data from a string variable instead of a file.
 If passing `from_string=TRUE`, then `file` is assumed to be a variable with the
@@ -136,14 +143,6 @@ a row in the data) the lines that start with `#`.
 Be aware that the data is represented as a CSR matrix with index pointer of
 class C `int`, thus the number of rows/columns/non-zero-elements cannot exceed
 `.Machine$integer.max`.
-
-On Windows, if the package is installed from CRAN and compiled using the GCC
-compiler version 4 or earlier (the default in older versions of RTools, such
-as Rtools35), it will not be able to read from or write to file names with
-non-ASCII characters, which can be solved by installing it directly from the
-GitHub repository (`remotes::install_github("david-cortes/readsparse")`).
-Whether support for non-ASCII file names is available or not can be checked
-through \link{readsparse_nonascii_support}.
 
 On 64-bit Windows systems, if compiling the library with a compiler other than MinGW
 or MSVC, it will not be able to read files larger than 2GB. This should not be a concern

@@ -929,15 +929,7 @@ bool write_single_label_template
                 #ifdef HAS_FULL_STDIO
                 succeded = fprintf(output_file, label_specifier, decimal_places, labels[row]);
                 #else
-                #   if defined(_MSC_VER)
-                #       pragma warning( push )
-                #       pragma warning( disable : 4705 )
-                #       pragma warning( disable : 4477 )
-                #   endif
                 succeded = fprintf(output_file, label_specifier, labels[row]);
-                #   if defined(_MSC_VER)
-                #       pragma warning( pop )
-                #   endif
                 #endif
             }
 
